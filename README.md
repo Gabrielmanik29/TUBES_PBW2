@@ -92,7 +92,7 @@ Tabel utama:
 
 ---
 
-## Testing & 🔒 Keamanan
+## Testing & Keamanan
 
 -   **Testing:** Feature Test Laravel untuk seluruh alur peminjaman.
 -   **Validasi Input:** Laravel Validation.
