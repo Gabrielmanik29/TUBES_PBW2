@@ -1,10 +1,10 @@
-# 📦 Sistem Inventaris dan Peminjaman Barang
+# Sistem Inventaris dan Peminjaman Barang
 
 Proyek ini merupakan aplikasi berbasis web yang dikembangkan menggunakan **Laravel 11** untuk mendigitalisasi proses inventarisasi dan peminjaman barang di lingkungan kampus. Sistem ini membantu pengurus dalam mengelola daftar barang, memantau status peminjaman, serta meningkatkan akuntabilitas anggota melalui sistem denda otomatis yang terintegrasi dengan pembayaran online.
 
 ---
 
-## 👥 Identitas Kelompok
+## Identitas Kelompok
 
 -   Gabriel Armando Manik (607062430011)
 -   Excellence Nachua (607062400032)
@@ -15,7 +15,7 @@ Kelas: **D3IF – 48 - 04**
 
 ---
 
-## 🚀 Ringkasan Proyek
+## Ringkasan Proyek
 
 -   **Tujuan:** Memudahkan pengelolaan inventaris dan peminjaman barang kampus.
 -   **Target Pengguna:**
@@ -30,7 +30,7 @@ Kelas: **D3IF – 48 - 04**
 
 ---
 
-## 🛠️ Arsitektur & Teknologi
+## Arsitektur & Teknologi
 
 -   **Framework:** Laravel 11
 -   **Database:** MySQL
@@ -39,7 +39,7 @@ Kelas: **D3IF – 48 - 04**
 
 ---
 
-## 📑 Breakdown Fitur
+## Breakdown Fitur
 
 | #   | Modul                     | Fitur                 | Deskripsi                                                 | Teknologi                                      | Kriteria Keberhasilan                   |
 | --- | ------------------------- | --------------------- | --------------------------------------------------------- | ---------------------------------------------- | --------------------------------------- |
@@ -52,7 +52,7 @@ Kelas: **D3IF – 48 - 04**
 
 ---
 
-## 🗄️ Rancangan Database
+## Rancangan Database
 
 Tabel utama:
 
@@ -64,7 +64,7 @@ Tabel utama:
 
 ---
 
-## 🌐 Rute Utama
+## Rute Utama
 
 -   `GET /dashboard` → Dashboard sesuai role
 -   `GET /items` → Daftar barang tersedia
@@ -75,7 +75,7 @@ Tabel utama:
 
 ---
 
-## 📅 Sprint / Timeline
+## Sprint / Timeline
 
 1. **Sprint 1 (1 Minggu):** Setup proyek & autentikasi
 2. **Sprint 2 (2 Minggu):** CRUD kategori & barang
@@ -85,14 +85,14 @@ Tabel utama:
 
 ---
 
-## ✅ Acceptance Criteria
+## Acceptance Criteria
 
 -   **Peminjaman:** hanya bisa dilakukan jika stok > 0, status tercatat sebagai _Diajukan_.
 -   **Denda:** otomatis dihitung jika terlambat, status pembayaran tercatat di database.
 
 ---
 
-## 🧪 Testing & 🔒 Keamanan
+## Testing & 🔒 Keamanan
 
 -   **Testing:** Feature Test Laravel untuk seluruh alur peminjaman.
 -   **Validasi Input:** Laravel Validation.
@@ -101,7 +101,7 @@ Tabel utama:
 
 ---
 
-## 🔮 Rencana Pengembangan Lanjut
+## Rencana Pengembangan Lanjut
 
 -   Notifikasi (Email/WhatsApp) pengingat pengembalian.
 -   Fitur Booking barang.
@@ -109,7 +109,7 @@ Tabel utama:
 
 ---
 
-## 📊 Tabel Ringkasan Fitur
+## Tabel Ringkasan Fitur
 
 | Modul                     | Nama Fitur            | Fungsi Utama                                       | Langkah Implementasi                       | Acceptance Criteria                     |
 | ------------------------- | --------------------- | -------------------------------------------------- | ------------------------------------------ | --------------------------------------- |
