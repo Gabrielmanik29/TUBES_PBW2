@@ -1,59 +1,121 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📦 Sistem Inventaris dan Peminjaman Barang
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Proyek ini merupakan aplikasi berbasis web yang dikembangkan menggunakan **Laravel 11** untuk mendigitalisasi proses inventarisasi dan peminjaman barang di lingkungan kampus. Sistem ini membantu pengurus dalam mengelola daftar barang, memantau status peminjaman, serta meningkatkan akuntabilitas anggota melalui sistem denda otomatis yang terintegrasi dengan pembayaran online.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 👥 Identitas Kelompok
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   Gabriel Armando Manik (607062430011)
+-   Excellence Nachua (607062400032)
+-   Nafiza Triana Azzahra (607062400069)
+-   Fabio Rifqi Herawan (607062400017)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Kelas: **D3IF – 48 - 04**
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🚀 Ringkasan Proyek
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+-   **Tujuan:** Memudahkan pengelolaan inventaris dan peminjaman barang kampus.
+-   **Target Pengguna:**
+    -   **Admin** → mengelola barang, kategori, dan peminjaman.
+    -   **Anggota** → melakukan peminjaman dan pembayaran denda.
+-   **Fitur Utama:**
+    -   Autentikasi & Otorisasi (Admin/Anggota)
+    -   Manajemen Kategori & Barang
+    -   Peminjaman & Pengembalian
+    -   Denda & Tagihan otomatis
+    -   Pembayaran online via Midtrans
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🛠️ Arsitektur & Teknologi
 
-### Premium Partners
+-   **Framework:** Laravel 11
+-   **Database:** MySQL
+-   **Autentikasi:** Laravel Breeze (Blade + Tailwind CSS)
+-   **Payment Gateway:** Midtrans
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 📑 Breakdown Fitur
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| #   | Modul                     | Fitur                 | Deskripsi                                                 | Teknologi                                      | Kriteria Keberhasilan                   |
+| --- | ------------------------- | --------------------- | --------------------------------------------------------- | ---------------------------------------------- | --------------------------------------- |
+| 1   | Autentikasi & Otorisasi   | Login/Registrasi      | Mengelola akses pengguna berdasarkan role (Admin/Anggota) | Laravel Breeze, Middleware role-based          | User/Admin dapat login sesuai hak akses |
+| 2   | Manajemen Kategori        | CRUD Kategori         | Mengelola kategori barang                                 | Controller + Blade form                        | Data kategori tersimpan di DB           |
+| 3   | Manajemen Barang          | CRUD Barang           | Menambah/mengedit barang dengan stok & kategori           | Relasi ke tabel `categories`                   | Barang tampil di daftar items           |
+| 4   | Peminjaman & Pengembalian | Ajukan & Konfirmasi   | Anggota meminjam, admin menyetujui & mengembalikan        | Relasi ke `users` & `items`, status peminjaman | Status tercatat di DB                   |
+| 5   | Denda & Tagihan           | Hitung Denda Otomatis | Sistem menghitung denda keterlambatan                     | Logic di model `Peminjaman`                    | Tagihan muncul di dashboard             |
+| 6   | Pembayaran                | Midtrans Integration  | Membayar denda online dengan verifikasi webhook           | API Midtrans + webhook callback                | Status pembayaran valid di DB           |
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🗄️ Rancangan Database
 
-## Security Vulnerabilities
+Tabel utama:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+-   `users` → data pengguna (Admin/Anggota)
+-   `categories` → kategori barang
+-   `items` → data barang (relasi ke kategori)
+-   `peminjamans` → transaksi peminjaman (relasi ke users & items)
+-   `payments` → detail pembayaran denda (relasi ke peminjamans)
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🌐 Rute Utama
+
+-   `GET /dashboard` → Dashboard sesuai role
+-   `GET /items` → Daftar barang tersedia
+-   `POST /borrow/{item}` → Ajukan peminjaman
+-   `GET /admin/peminjaman` → Kelola peminjaman (Admin)
+-   `POST /admin/peminjaman/{id}/approve` → Persetujuan peminjaman
+-   `POST /payment/callback` → Callback Midtrans
+
+---
+
+## 📅 Sprint / Timeline
+
+1. **Sprint 1 (1 Minggu):** Setup proyek & autentikasi
+2. **Sprint 2 (2 Minggu):** CRUD kategori & barang
+3. **Sprint 3 (2 Minggu):** Logika peminjaman & pengembalian
+4. **Sprint 4 (1 Minggu):** Dashboard Admin & Anggota
+5. **Sprint 5 (2 Minggu):** Denda & integrasi Midtrans
+
+---
+
+## ✅ Acceptance Criteria
+
+-   **Peminjaman:** hanya bisa dilakukan jika stok > 0, status tercatat sebagai _Diajukan_.
+-   **Denda:** otomatis dihitung jika terlambat, status pembayaran tercatat di database.
+
+---
+
+## 🧪 Testing & 🔒 Keamanan
+
+-   **Testing:** Feature Test Laravel untuk seluruh alur peminjaman.
+-   **Validasi Input:** Laravel Validation.
+-   **Otorisasi:** Middleware untuk rute admin.
+-   **Proteksi CSRF:** Aktif di semua form POST.
+
+---
+
+## 🔮 Rencana Pengembangan Lanjut
+
+-   Notifikasi (Email/WhatsApp) pengingat pengembalian.
+-   Fitur Booking barang.
+-   Dashboard Analytics (barang paling sering dipinjam, anggota paling sering terlambat).
+
+---
+
+## 📊 Tabel Ringkasan Fitur
+
+| Modul                     | Nama Fitur            | Fungsi Utama                                       | Langkah Implementasi                       | Acceptance Criteria                     |
+| ------------------------- | --------------------- | -------------------------------------------------- | ------------------------------------------ | --------------------------------------- |
+| Autentikasi & Otorisasi   | Login/Registrasi      | Mengelola akses pengguna berdasarkan role          | Laravel Breeze, Middleware role-based      | User/Admin dapat login sesuai hak akses |
+| Manajemen Kategori        | CRUD Kategori         | Mengelola kategori barang                          | Controller + Blade form                    | Data kategori tersimpan di DB           |
+| Manajemen Barang          | CRUD Barang           | Menambah/mengedit barang dengan stok & kategori    | Relasi ke tabel categories                 | Barang tampil di daftar items           |
+| Peminjaman & Pengembalian | Ajukan & Konfirmasi   | Anggota meminjam, admin menyetujui & mengembalikan | Relasi ke users & items, status peminjaman | Status tercatat di DB                   |
+| Denda & Tagihan           | Hitung Denda Otomatis | Sistem menghitung denda keterlambatan              | Logic di model peminjamans                 | Tagihan muncul di dashboard             |
+| Pembayaran                | Midtrans Integration  | Membayar denda online                              | API Midtrans + webhook callback            | Status pembayaran valid di DB           |
