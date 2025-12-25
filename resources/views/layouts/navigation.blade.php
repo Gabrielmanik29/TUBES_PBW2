@@ -54,44 +54,44 @@
 
                     <!-- Admin Menu (for Admin users) -->
                     @if(Auth::user()->role === 'admin')
-                        <div class="relative" x-data="{ adminOpen: false }">
-                            <button @click="adminOpen = !adminOpen"
-                                :class="{'bg-purple-100 text-purple-700': adminOpen, 'text-gray-700 hover:bg-purple-50': !adminOpen}"
-                                class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
-                                <i class="fas fa-crown mr-2"></i>
-                                Admin
-                                <svg class="ml-2 w-4 h-4 transition-transform" :class="{'rotate-180': adminOpen}"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
+                    <div class="relative" x-data="{ adminOpen: false }">
+                        <button @click="adminOpen = !adminOpen"
+                            :class="{'bg-purple-100 text-purple-700': adminOpen, 'text-gray-700 hover:bg-purple-50': !adminOpen}"
+                            class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
+                            <i class="fas fa-crown mr-2"></i>
+                            Admin
+                            <svg class="ml-2 w-4 h-4 transition-transform" :class="{'rotate-180': adminOpen}"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
 
-                            <div x-show="adminOpen" @click.away="adminOpen = false" x-transition
-                                class="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                                <a href="#"
-                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                                    <i class="fas fa-boxes mr-3 text-purple-500"></i>
-                                    Kelola Barang
-                                </a>
-                                <a href="#"
-                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                                    <i class="fas fa-clipboard-check mr-3 text-purple-500"></i>
-                                    Approve Peminjaman
-                                </a>
-                                <a href="#"
-                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                                    <i class="fas fa-undo mr-3 text-purple-500"></i>
-                                    Pengembalian
-                                </a>
-                                <hr class="my-2 border-gray-200">
-                                <a href="#"
-                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                                    <i class="fas fa-chart-bar mr-3 text-purple-500"></i>
-                                    Laporan
-                                </a>
-                            </div>
+                        <div x-show="adminOpen" @click.away="adminOpen = false" x-transition
+                            class="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                            <a href="#"
+                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                                <i class="fas fa-boxes mr-3 text-purple-500"></i>
+                                Kelola Barang
+                            </a>
+                            <a href="{{ route('admin.peminjamans.index') }}"
+                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                                <i class="fas fa-clipboard-check mr-3 text-purple-500"></i>
+                                Approve Peminjaman
+                            </a>
+                            <a href="#"
+                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                                <i class="fas fa-undo mr-3 text-purple-500"></i>
+                                Pengembalian
+                            </a>
+                            <hr class="my-2 border-gray-200">
+                            <a href="#"
+                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                                <i class="fas fa-chart-bar mr-3 text-purple-500"></i>
+                                Laporan
+                            </a>
                         </div>
+                    </div>
                     @endif
                 </div>
             </div>
@@ -211,29 +211,29 @@
 
             <!-- Mobile Admin Menu -->
             @if(Auth::user()->role === 'admin')
-                <div class="px-3 py-2">
-                    <div class="flex items-center text-purple-700 font-medium">
-                        <i class="fas fa-crown mr-3"></i>
-                        Menu Admin
-                    </div>
-                    <div class="ml-6 mt-2 space-y-1">
-                        <a href="#"
-                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
-                            <i class="fas fa-boxes mr-3"></i>
-                            Kelola Barang
-                        </a>
-                        <a href="#"
-                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
-                            <i class="fas fa-clipboard-check mr-3"></i>
-                            Approve Peminjaman
-                        </a>
-                        <a href="#"
-                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
-                            <i class="fas fa-undo mr-3"></i>
-                            Pengembalian
-                        </a>
-                    </div>
+            <div class="px-3 py-2">
+                <div class="flex items-center text-purple-700 font-medium">
+                    <i class="fas fa-crown mr-3"></i>
+                    Menu Admin
                 </div>
+                <div class="ml-6 mt-2 space-y-1">
+                    <a href="#"
+                        class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
+                        <i class="fas fa-boxes mr-3"></i>
+                        Kelola Barang
+                    </a>
+                    <a href="{{ route('admin.peminjamans.index') }}"
+                        class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
+                        <i class="fas fa-clipboard-check mr-3"></i>
+                        Approve Peminjaman
+                    </a>
+                    <a href="#"
+                        class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
+                        <i class="fas fa-undo mr-3"></i>
+                        Pengembalian
+                    </a>
+                </div>
+            </div>
             @endif
         </div>
 

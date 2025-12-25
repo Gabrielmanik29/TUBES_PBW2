@@ -9,6 +9,14 @@ class Peminjaman extends Model
 {
     use HasFactory;
 
+    const STATUS_DIAJUKAN = 'diajukan';
+    const STATUS_DISETUJUI = 'disetujui';
+    const STATUS_DITOLAK = 'ditolak';
+    const STATUS_DIBATALKAN = 'dibatalkan';
+    const STATUS_DIPINJAM = 'dipinjam';
+    const STATUS_DIKEMBALIKAN = 'dikembalikan';
+    const STATUS_TERLAMBAT = 'terlambat';
+
     protected $table = 'peminjamans';
 
     protected $fillable = [

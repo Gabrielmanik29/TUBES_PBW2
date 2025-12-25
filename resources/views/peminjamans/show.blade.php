@@ -97,11 +97,22 @@
                             Kembali ke Riwayat
                         </a>
 
-                        @if($peminjaman->status == 'diajukan' && $peminjaman->user_id == Auth::id())
-                        <button onclick="cancelPeminjaman('{{ $peminjaman->id }}')" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                            Batalkan Peminjaman
-                        </button>
-                        @endif
+                        <div class="flex space-x-2">
+                            @if($peminjaman->status == 'diajukan' && $peminjaman->user_id == Auth::id())
+                            <button onclick="cancelPeminjaman('{{ $peminjaman->id }}')" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                Batalkan Peminjaman
+                            </button>
+                            @endif
+
+                            @if($peminjaman->status == 'diajukan' && Auth::user()->isAdmin())
+                            <button onclick="rejectPeminjaman('{{ $peminjaman->id }}')" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                Tolak Peminjaman
+                            </button>
+                            <button onclick="approvePeminjaman('{{ $peminjaman->id }}')" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                Setujui Peminjaman
+                            </button>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
