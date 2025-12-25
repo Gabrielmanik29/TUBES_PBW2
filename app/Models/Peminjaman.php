@@ -9,10 +9,18 @@ class Peminjaman extends Model
 {
     use HasFactory;
 
+    protected $table = 'peminjamans';
+
     protected $fillable = [
-        'user_id', 'item_id', 'quantity', 'tanggal_pinjam', 
-        'tanggal_kembali', 'tanggal_pengembalian_aktual', 
-        'status', 'denda', 'denda_dibayar'
+        'user_id',
+        'item_id',
+        'quantity',
+        'tanggal_pinjam',
+        'tanggal_kembali',
+        'tanggal_pengembalian_aktual',
+        'status',
+        'denda',
+        'denda_dibayar'
     ];
 
     protected $casts = [
