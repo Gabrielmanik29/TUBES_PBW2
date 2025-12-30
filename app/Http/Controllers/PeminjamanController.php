@@ -1,255 +1,165 @@
 <?php
+// app/Http/Controllers/PeminjamanController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Peminjaman;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class PeminjamanController extends Controller
 {
-    public function history()
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            abort(403);
-        }
-
-        $peminjamans = Peminjaman::where('user_id', $user->id)
-            ->with(['item.category'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        return view('peminjamans.history', compact('peminjamans'));
-    }
-
+    /**
+     * Display a listing of the user's borrowings.
+     */
     public function myBorrowings()
     {
-        $user = Auth::user();
-
-        if (!$user) {
-            abort(403);
+        // Pastikan user login
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
 
-        $peminjamans = Peminjaman::where('user_id', $user->id)
-            ->whereIn('status', [
-                Peminjaman::STATUS_DIAJUKAN,
-                Peminjaman::STATUS_DISETUJUI,
-                Peminjaman::STATUS_DIPINJAM,
-            ])
-            ->with(['item.category'])
+        // Ambil data peminjaman user saat ini dengan eager loading
+        $peminjamans = Peminjaman::with(['item.category'])
+            ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('peminjamans.my-borrowings', compact('peminjamans'));
+        // Hitung statistik untuk user
+        $stats = [
+            'total' => Peminjaman::where('user_id', Auth::id())->count(),
+            'active' => Peminjaman::where('user_id', Auth::id())
+                ->whereIn('status', ['diajukan', 'disetujui'])
+                ->count(),
+            'overdue' => Peminjaman::where('user_id', Auth::id())
+                ->where('status', 'disetujui')
+                ->where('tanggal_kembali', '<', now())
+                ->whereNull('tanggal_pengembalian_aktual')
+                ->count(),
+        ];
+
+        return view('peminjaman.my-borrowings', compact('peminjamans', 'stats'));
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created borrowing request.
+     */
+    public function store(Request $request, $itemId) // UBAH: Item $item jadi $itemId
     {
-        $user = Auth::user();
-        if (!$user) {
-            abort(403);
+        // Validasi item ID
+        $item = Item::findOrFail($itemId);
+
+        // Validasi input form
+        $validated = $request->validate([
+            'quantity' => [
+                'required',
+                'integer',
+                'min:1',
+                function ($attribute, $value, $fail) use ($item) {
+                    if ($value > $item->stock_tersedia) {
+                        $fail('Jumlah melebihi stok tersedia. Stok tersedia: ' . $item->stock_tersedia);
+                    }
+                },
+            ],
+            'tanggal_pinjam' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+            ],
+            'tanggal_kembali' => [
+                'required',
+                'date',
+                'after:tanggal_pinjam',
+                function ($attribute, $value, $fail) use ($request) {
+                    $tanggalPinjam = Carbon::parse($request->tanggal_pinjam);
+                    $tanggalKembali = Carbon::parse($value);
+                    $lamaPinjam = $tanggalPinjam->diffInDays($tanggalKembali);
+                    
+                    if ($lamaPinjam > 7) {
+                        $fail('Maksimal peminjaman adalah 7 hari');
+                    }
+                    
+                    if ($lamaPinjam < 1) {
+                        $fail('Minimal peminjaman adalah 1 hari');
+                    }
+                },
+            ],
+        ], [
+            'quantity.required' => 'Jumlah harus diisi',
+            'quantity.integer' => 'Jumlah harus angka',
+            'quantity.min' => 'Jumlah minimal 1',
+            'tanggal_pinjam.required' => 'Tanggal pinjam harus diisi',
+            'tanggal_pinjam.after_or_equal' => 'Tanggal pinjam minimal hari ini',
+            'tanggal_kembali.required' => 'Tanggal kembali harus diisi',
+            'tanggal_kembali.after' => 'Tanggal kembali harus setelah tanggal pinjam',
+        ]);
+
+        // Cek apakah user sudah meminjam barang yang sama yang belum dikembalikan
+        $existingBorrowing = Peminjaman::where('user_id', Auth::id())
+            ->where('item_id', $item->id)
+            ->whereIn('status', ['diajukan', 'disetujui'])
+            ->first();
+
+        if ($existingBorrowing) {
+            return redirect()->back()
+                ->withErrors(['item' => 'Anda sudah meminjam barang ini dan belum mengembalikan'])
+                ->withInput();
         }
 
-        $request->validate([
-            'item_id' => 'required|exists:items,id',
-            'quantity' => 'required|integer|min:1',
-            'tanggal_pinjam' => 'required|date|after_or_equal:today',
-            'tanggal_kembali' => 'required|date|after:tanggal_pinjam',
-            'notes' => 'nullable|string',
-        ]);
+        // Mulai transaction untuk consistency data
+        DB::beginTransaction();
+        try {
+            // Buat record peminjaman
+            $peminjaman = Peminjaman::create([
+                'user_id' => Auth::id(),
+                'item_id' => $item->id,
+                'quantity' => $validated['quantity'],
+                'tanggal_pinjam' => $validated['tanggal_pinjam'],
+                'tanggal_kembali' => $validated['tanggal_kembali'],
+                'status' => 'diajukan',
+                'denda' => 0,
+                'denda_dibayar' => false,
+            ]);
 
-        $item = Item::findOrFail($request->item_id);
+            DB::commit();
 
-        // VALIDASI STOK
-        $overlappingQty = Peminjaman::where('item_id', $item->id)
-            ->whereIn('status', [
-                Peminjaman::STATUS_DIAJUKAN,
-                Peminjaman::STATUS_DISETUJUI,
-                Peminjaman::STATUS_DIPINJAM,
-            ])
-            ->where('tanggal_pinjam', '<=', $request->tanggal_kembali)
-            ->where('tanggal_kembali', '>=', $request->tanggal_pinjam)
-            ->sum('quantity');
+            return redirect()->route('my.borrowings')
+                ->with('success', 'Peminjaman berhasil diajukan. Menunggu persetujuan admin.')
+                ->with('peminjaman_id', $peminjaman->id);
 
-        $availableStock = max(0, $item->stock - $overlappingQty);
-
-        if ($request->quantity > $availableStock) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Stok tidak mencukupi. Stok tersedia: ' . $availableStock,
-            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return redirect()->back()
+                ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()])
+                ->withInput();
         }
-
-        $peminjaman = Peminjaman::create([
-            'user_id' => $user->id,
-            'item_id' => $item->id,
-            'quantity' => $request->quantity,
-            'tanggal_pinjam' => $request->tanggal_pinjam,
-            'tanggal_kembali' => $request->tanggal_kembali,
-            'status' => Peminjaman::STATUS_DIAJUKAN,
-            'notes' => $request->notes,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Permintaan peminjaman berhasil dikirim.',
-            'peminjaman_id' => $peminjaman->id,
-        ]);
     }
 
-    public function show(Peminjaman $peminjaman)
+    /**
+     * Cancel a borrowing request (only if status is 'diajukan')
+     */
+    public function cancel($peminjamanId) // UBAH: Peminjaman $peminjaman jadi $peminjamanId
     {
-        $user = Auth::user();
-        if (!$user) {
-            abort(403);
+        $peminjaman = Peminjaman::findOrFail($peminjamanId);
+
+        // Authorization: hanya user yang membuat peminjaman yang bisa cancel
+        if ($peminjaman->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
         }
 
-        if ($user->id !== $peminjaman->user_id && !$user->isAdmin()) {
-            abort(403);
+        // Hanya bisa cancel jika status masih 'diajukan'
+        if ($peminjaman->status !== 'diajukan') {
+            return redirect()->route('my.borrowings')
+                ->with('error', 'Tidak bisa membatalkan peminjaman yang sudah ' . $peminjaman->status);
         }
 
-        $peminjaman->load(['item.category', 'user']);
+        $peminjaman->update(['status' => 'dibatalkan']);
 
-        return view('peminjamans.show', compact('peminjaman'));
-    }
-
-    public function cancel(Peminjaman $peminjaman)
-    {
-        $user = Auth::user();
-        if (!$user || $user->id !== $peminjaman->user_id) {
-            abort(403);
-        }
-
-        if ($peminjaman->status !== Peminjaman::STATUS_DIAJUKAN) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Peminjaman tidak dapat dibatalkan.',
-            ], 422);
-        }
-
-        $peminjaman->update([
-            'status' => Peminjaman::STATUS_DIBATALKAN,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Peminjaman berhasil dibatalkan.',
-        ]);
-    }
-
-    public function checkAvailability(Request $request)
-    {
-        $request->validate([
-            'item_id' => 'required|exists:items,id',
-            'tanggal_pinjam' => 'required|date',
-            'tanggal_kembali' => 'required|date|after:tanggal_pinjam',
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        $item = Item::findOrFail($request->item_id);
-
-        $overlappingQty = Peminjaman::where('item_id', $item->id)
-            ->whereIn('status', [
-                Peminjaman::STATUS_DIAJUKAN,
-                Peminjaman::STATUS_DISETUJUI,
-                Peminjaman::STATUS_DIPINJAM,
-            ])
-            ->where('tanggal_pinjam', '<=', $request->tanggal_kembali)
-            ->where('tanggal_kembali', '>=', $request->tanggal_pinjam)
-            ->sum('quantity');
-
-        $availableStock = max(0, $item->stock - $overlappingQty);
-
-        return response()->json([
-            'available' => $request->quantity <= $availableStock,
-            'available_stock' => $availableStock,
-        ]);
-    }
-
-    public function adminIndex()
-    {
-        $user = Auth::user();
-        if (!$user || !$user->isAdmin()) {
-            abort(403);
-        }
-
-        $peminjamans = Peminjaman::where('status', Peminjaman::STATUS_DIAJUKAN)
-            ->with(['item.category', 'user'])
-            ->orderBy('created_at', 'asc')
-            ->paginate(15);
-
-        return view('admin.peminjamans.index', compact('peminjamans'));
-    }
-
-    public function approve(Peminjaman $peminjaman)
-    {
-        $user = Auth::user();
-        if (!$user || !$user->isAdmin()) {
-            abort(403);
-        }
-
-        if ($peminjaman->status !== Peminjaman::STATUS_DIAJUKAN) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Peminjaman tidak dapat disetujui.',
-            ], 422);
-        }
-
-        $peminjaman->load('item');
-
-        $overlappingQty = Peminjaman::where('item_id', $peminjaman->item_id)
-            ->whereIn('status', [
-                Peminjaman::STATUS_DIAJUKAN,
-                Peminjaman::STATUS_DISETUJUI,
-                Peminjaman::STATUS_DIPINJAM,
-            ])
-            ->where('tanggal_pinjam', '<=', $peminjaman->tanggal_kembali)
-            ->where('tanggal_kembali', '>=', $peminjaman->tanggal_pinjam)
-            ->sum('quantity');
-
-        $availableStock = max(0, $peminjaman->item->stock - $overlappingQty);
-
-        if ($peminjaman->quantity > $availableStock) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Stok tidak mencukupi.',
-            ], 422);
-        }
-
-        $peminjaman->update([
-            'status' => Peminjaman::STATUS_DISETUJUI,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Peminjaman berhasil disetujui.',
-        ]);
-    }
-
-    public function reject(Peminjaman $peminjaman)
-    {
-        $user = Auth::user();
-        if (!$user || !$user->isAdmin()) {
-            abort(403);
-        }
-
-        if ($peminjaman->status !== Peminjaman::STATUS_DIAJUKAN) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Peminjaman tidak dapat ditolak.',
-            ], 422);
-        }
-
-        $peminjaman->update([
-            'status' => Peminjaman::STATUS_DITOLAK,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Peminjaman berhasil ditolak.',
-        ]);
+        return redirect()->route('my.borrowings')
+            ->with('success', 'Peminjaman berhasil dibatalkan');
     }
 }

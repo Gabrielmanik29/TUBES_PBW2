@@ -1,148 +1,107 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Detail Peminjaman') }}
-        </h2>
-    </x-slot>
+<!-- resources/views/peminjaman/show.blade.php -->
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Item Information -->
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Informasi Barang</h3>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Nama Barang</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->item->name }}</p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Kategori</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->item->category->name }}</p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Jumlah Dipinjam</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->quantity }}</p>
-                                </div>
-                            </div>
-                        </div>
+@section('title', 'Detail Peminjaman')
 
-                        <!-- Borrowing Information -->
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Informasi Peminjaman</h3>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Tanggal Pinjam</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->tanggal_pinjam->format('d F Y') }}</p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Tanggal Kembali</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->tanggal_kembali->format('d F Y') }}</p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Status</label>
-                                    <span class="mt-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                        @if($peminjaman->status == 'diajukan') bg-yellow-100 text-yellow-800
-                                        @elseif($peminjaman->status == 'disetujui') bg-green-100 text-green-800
-                                        @elseif($peminjaman->status == 'ditolak') bg-red-100 text-red-800
-                                        @elseif($peminjaman->status == 'dibatalkan') bg-gray-100 text-gray-800
-                                        @elseif($peminjaman->status == 'dikembalikan') bg-blue-100 text-blue-800
-                                        @endif">
-                                        {{ ucfirst($peminjaman->status) }}
-                                    </span>
-                                </div>
-                                @if($peminjaman->tanggal_pengembalian_aktual)
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Tanggal Pengembalian Aktual</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->tanggal_pengembalian_aktual->format('d F Y') }}</p>
-                                </div>
-                                @endif
-                            </div>
-                        </div>
+@section('content')
+<div class="py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Kembali ke halaman sebelumnya -->
+        <a href="{{ route('my.borrowings') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Kembali ke Riwayat Peminjaman
+        </a>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <!-- Header -->
+            <div class="px-4 py-5 sm:px-6 border-b">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    Detail Peminjaman #{{ $peminjaman->id }}
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                    Informasi lengkap peminjaman barang
+                </p>
+            </div>
+
+            <!-- Content -->
+            <div class="px-4 py-5 sm:p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Informasi Barang -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-medium text-gray-700 mb-2">Informasi Barang</h4>
+                        <p><strong>Nama:</strong> {{ $peminjaman->item->name }}</p>
+                        <p><strong>Kategori:</strong> {{ $peminjaman->item->category->name }}</p>
+                        <p><strong>Jumlah:</strong> {{ $peminjaman->quantity }} unit</p>
                     </div>
 
-                    <!-- Notes -->
-                    @if($peminjaman->notes)
-                    <div class="mt-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">Catatan</h3>
-                        <p class="text-sm text-gray-700 bg-gray-50 p-3 rounded">{{ $peminjaman->notes }}</p>
+                    <!-- Informasi Peminjaman -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-medium text-gray-700 mb-2">Informasi Peminjaman</h4>
+                        <p><strong>Tanggal Pinjam:</strong> {{ $peminjaman->tanggal_pinjam->format('d F Y') }}</p>
+                        <p><strong>Tanggal Kembali:</strong> {{ $peminjaman->tanggal_kembali->format('d F Y') }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="px-2 py-1 text-xs rounded {{ $statusClasses[$peminjaman->status] ?? 'bg-gray-100' }}">
+                                {{ ucfirst($peminjaman->status) }}
+                            </span>
+                        </p>
+                    </div>
+
+                    <!-- Informasi Denda -->
+                    @if($peminjaman->denda > 0)
+                    <div class="bg-red-50 p-4 rounded-lg md:col-span-2">
+                        <h4 class="font-medium text-red-700 mb-2">Informasi Denda</h4>
+                        <p><strong>Total Denda:</strong> Rp {{ number_format($peminjaman->denda, 0, ',', '.') }}</p>
+                        <p><strong>Status Pembayaran:</strong> 
+                            {{ $peminjaman->denda_dibayar ? 'Lunas' : 'Belum Dibayar' }}
+                        </p>
+                        @if($peminjaman->hariKeterlambatan() > 0)
+                            <p><strong>Keterlambatan:</strong> {{ $peminjaman->hariKeterlambatan() }} hari</p>
+                        @endif
                     </div>
                     @endif
 
-                    <!-- Fine Information -->
-                    @if($peminjaman->status == 'dikembalikan' && $peminjaman->tanggal_pengembalian_aktual > $peminjaman->tanggal_kembali)
-                    <div class="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
-                        <h3 class="text-lg font-medium text-red-800 mb-2">Informasi Denda</h3>
-                        <div class="space-y-2">
-                            <p class="text-sm text-red-700">
-                                Terlambat: {{ $peminjaman->tanggal_pengembalian_aktual->diffInDays($peminjaman->tanggal_kembali) }} hari
-                            </p>
-                            <p class="text-sm text-red-700">
-                                Denda: Rp {{ number_format($peminjaman->hitungDenda(), 0, ',', '.') }}
-                            </p>
-                            @if($peminjaman->denda_dibayar)
-                            <p class="text-sm text-green-700">Status: Sudah dibayar</p>
+                    <!-- Informasi Pengembalian -->
+                    @if($peminjaman->tanggal_pengembalian_aktual)
+                    <div class="bg-blue-50 p-4 rounded-lg md:col-span-2">
+                        <h4 class="font-medium text-blue-700 mb-2">Informasi Pengembalian</h4>
+                        <p><strong>Tanggal Dikembalikan:</strong> {{ $peminjaman->tanggal_pengembalian_aktual->format('d F Y') }}</p>
+                        <p><strong>Keterlambatan:</strong> 
+                            @if($peminjaman->isTerlambat())
+                                {{ $peminjaman->hariKeterlambatan() }} hari
                             @else
-                            <p class="text-sm text-red-700">Status: Belum dibayar</p>
+                                Tepat waktu
                             @endif
-                        </div>
+                        </p>
                     </div>
                     @endif
+                </div>
 
-                    <!-- Actions -->
-                    <div class="mt-8 flex justify-between">
-                        <a href="{{ route('peminjamans.history') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                            Kembali ke Riwayat
-                        </a>
+                <!-- Tombol Aksi -->
+                <div class="mt-6 flex justify-end space-x-3">
+                    @if($peminjaman->status === 'diajukan')
+                    <form action="{{ route('peminjaman.cancel', $peminjaman) }}" method="POST" 
+                          onsubmit="return confirm('Yakin ingin membatalkan peminjaman?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                            Batalkan Peminjaman
+                        </button>
+                    </form>
+                    @endif
 
-                        <div class="flex space-x-2">
-                            @if($peminjaman->status == 'diajukan' && $peminjaman->user_id == Auth::id())
-                            <button onclick="cancelPeminjaman('{{ $peminjaman->id }}')" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                Batalkan Peminjaman
-                            </button>
-                            @endif
-
-                            @if($peminjaman->status == 'diajukan' && Auth::user()->isAdmin())
-                            <button onclick="rejectPeminjaman('{{ $peminjaman->id }}')" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                Tolak Peminjaman
-                            </button>
-                            <button onclick="approvePeminjaman('{{ $peminjaman->id }}')" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                Setujui Peminjaman
-                            </button>
-                            @endif
-                        </div>
-                    </div>
+                    @if($peminjaman->denda > 0 && !$peminjaman->denda_dibayar)
+                    <form action="{{ route('payment.pay', $peminjaman) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                            Bayar Denda
+                        </button>
+                    </form>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        function cancelPeminjaman(id) {
-            if (confirm('Apakah Anda yakin ingin membatalkan peminjaman ini?')) {
-                fetch(`/peminjamans/${id}/cancel`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-                            window.location.href = '{{ route("peminjamans.history") }}';
-                        } else {
-                            alert(data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Terjadi kesalahan saat membatalkan peminjaman');
-                    });
-            }
-        }
-    </script>
-</x-app-layout>
+</div>
+@endsection
