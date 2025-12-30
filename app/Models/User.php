@@ -1,28 +1,46 @@
 <?php
-// app/Models/User.php
+
 
 namespace App\Models;
+
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role', // ← PASTIKAN ADA INI
+        'role', // Tambahkan ini
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
@@ -31,15 +49,27 @@ class User extends Authenticatable
         ];
     }
 
-    // Helper method untuk cek admin
+    /**
+     * Check if user is admin
+     */
     public function isAdmin()
     {
         return $this->role === 'admin';
     }
 
-    // Helper method untuk cek user biasa
+    /**
+     * Check if user is regular user
+     */
     public function isUser()
     {
-        return $this->role === 'user' || !$this->role;
+        return $this->role === 'user';
+    }
+
+    /**
+     * Get user's peminjamans
+     */
+    public function peminjamans()
+    {
+        return $this->hasMany(Peminjaman::class);
     }
 }
