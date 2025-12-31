@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\PeminjamanController;
@@ -13,9 +14,19 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+// Admin Dashboard Route (with custom name for redirect)
+Route::get('/admin/dashboard', [DashboardController::class, 'adminDashboard'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.dashboard');
+
+// User Dashboard Route
+Route::get('/user/dashboard', [DashboardController::class, 'userDashboard'])
+    ->middleware(['auth', 'verified'])
+    ->name('user.dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
