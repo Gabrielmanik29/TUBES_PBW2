@@ -420,4 +420,16 @@ class ItemController extends Controller
             'warning' => $durasi > 14 ? 'Durasi peminjaman melebihi 2 minggu' : null
         ]);
     }
+    // app/Models/Item.php (tambahkan method ini)
+
+public function isAvailableForBorrow($quantity)
+{
+    $dipinjam = $this->peminjamans()
+        ->whereIn('status', ['diajukan', 'disetujui'])
+        ->sum('quantity');
+    
+    $stokTersedia = $this->stock - $dipinjam;
+    
+    return $stokTersedia >= $quantity;
+}
 }

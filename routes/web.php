@@ -57,9 +57,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // ============ BORROWING ROUTES ============
 // These will be handled by PeminjamanController (Chua's part)
 Route::middleware(['auth'])->group(function () {
+    // Routes untuk peminjaman user
+    Route::get('/my-borrowings', [PeminjamanController::class, 'myBorrowings'])->name('my.borrowings');
     Route::post('/borrow/{item}', [PeminjamanController::class, 'store'])
         ->name('borrow.store')
         ->middleware('throttle:5,10'); // Limit 5 requests per 10 minutes
+    Route::delete('/peminjaman/{peminjaman}/cancel', [PeminjamanController::class, 'cancel'])->name('peminjaman.cancel');
 
     Route::get('/borrow/check-availability/{item}', [PeminjamanController::class, 'checkAvailability'])
         ->name('borrow.check');

@@ -26,7 +26,18 @@ class Item extends Model
         $dipinjam = $this->peminjamans()
             ->whereIn('status', ['diajukan', 'disetujui'])
             ->sum('quantity');
-        
+
         return $this->stock - $dipinjam;
+    }
+
+    public function isAvailableForBorrow($quantity)
+    {
+        $dipinjam = $this->peminjamans()
+            ->whereIn('status', ['diajukan', 'disetujui'])
+            ->sum('quantity');
+
+        $stokTersedia = $this->stock - $dipinjam;
+
+        return $stokTersedia >= $quantity;
     }
 }
