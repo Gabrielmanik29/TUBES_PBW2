@@ -57,17 +57,22 @@
 
                         <div x-show="adminOpen" @click.away="adminOpen = false" x-transition
                             class="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                            <a href="#"
+                            <a href="{{ route('admin.items.create') }}"
                                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
                                 <i class="fas fa-boxes mr-3 text-purple-500"></i>
                                 Kelola Barang
                             </a>
-                            <a href="#"
+                            <a href="{{ route('admin.categories.index') }}"
+                                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                                    <i class="fas fa-tags"></i>
+                                    Kelola Kategori
+                                </a>
+                            <a href="{{ route('admin.peminjaman') }}"
                                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
                                 <i class="fas fa-clipboard-check mr-3 text-purple-500"></i>
                                 Approve Peminjaman
                             </a>
-                            <a href="#"
+                            <a href="{{ route('admin.peminjaman') }}"
                                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
                                 <i class="fas fa-undo mr-3 text-purple-500"></i>
                                 Pengembalian
@@ -203,17 +208,22 @@
                     Menu Admin
                 </div>
                 <div class="ml-6 mt-2 space-y-1">
-                    <a href="#"
+                    <a href="{{ route('admin.items.create') }}"
                         class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
                         <i class="fas fa-boxes mr-3"></i>
                         Kelola Barang
                     </a>
-                    <a href="#"
+                    <a href="{{ route('admin.categories.index') }}"
+                        class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg"
+                        <i class="fas fa-tags mr-3"></i>
+                        Kelola Kategori
+                    </a>
+                    <a href="{{ route('admin.peminjaman') }}"
                         class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
                         <i class="fas fa-clipboard-check mr-3"></i>
                         Approve Peminjaman
                     </a>
-                    <a href="#"
+                    <a href="{{ route('admin.peminjaman') }}"
                         class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
                         <i class="fas fa-undo mr-3"></i>
                         Pengembalian

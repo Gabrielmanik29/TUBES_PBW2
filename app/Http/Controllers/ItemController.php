@@ -204,6 +204,30 @@ class ItemController extends Controller
         }
     }
 
+    public function store(Request $request)
+    {
+    $data = $request->validate([
+        'name' => 'required|string|max:100',
+        'category_id' => 'required|exists:categories,id',
+        'stock' => 'required|integer|min:0',
+        'description' => 'nullable|string',
+    ]);
+
+    Item::create([
+        'name' => $data['name'],
+        'category_id' => $data['category_id'],
+        'stock' => $data['stock'],
+        'description' => $data['description'] ?? null,
+    ]);
+
+    return redirect()->route('admin.items.create')->with('success', 'Barang berhasil ditambahkan.');
+}
+    public function create()
+    {
+    $categories = Category::orderBy('name')->get();
+
+    return view('admin.items.create', compact('categories'));
+    }
     /**
      * Display the specified item with detailed information
      */

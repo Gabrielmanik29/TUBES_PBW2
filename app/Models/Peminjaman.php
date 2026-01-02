@@ -20,7 +20,8 @@ class Peminjaman extends Model
         'tanggal_pengembalian_aktual',
         'status',
         'denda',
-        'denda_dibayar'
+        'denda_dibayar',
+        'rejection_reason'
     ];
 
     protected $casts = [

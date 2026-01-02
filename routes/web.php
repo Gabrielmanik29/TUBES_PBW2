@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\CategoryController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -22,8 +24,20 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
+    // PEMINJAMAN
+    Route::get('/peminjaman', [AdminController::class, 'peminjaman'])->name('admin.peminjaman');
+    Route::post('/peminjaman/{peminjaman}/approve', [AdminController::class, 'approve'])->name('admin.peminjaman.approve');
+    Route::post('/peminjaman/{peminjaman}/reject', [AdminController::class, 'reject'])->name('admin.peminjaman.reject');
+    Route::post('/peminjaman/{peminjaman}/return', [AdminController::class, 'return'])->name('admin.peminjaman.return');
 
+    // KATEGORI
+    Route::get('/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+});
 
 // ============ ITEM ROUTES FOR USERS ============
 Route::controller(ItemController::class)->name('items.')->group(function () {
