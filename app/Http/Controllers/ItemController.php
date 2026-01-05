@@ -8,12 +8,40 @@ use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+<<<<<<< HEAD
+=======
+use Illuminate\Support\Facades\Storage;
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class ItemController extends Controller
 {
     /**
+<<<<<<< HEAD
+=======
+     * Display a listing of ADMIN items
+     */
+    public function adminIndex(Request $request)
+    {
+        $query = Item::with('category')->orderBy('name');
+
+        if ($request->has('search')) {
+            $query->where('name', 'LIKE', '%' . $request->search . '%');
+        }
+
+        if ($request->has('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        $items = $query->paginate(10);
+        $categories = Category::orderBy('name')->get(['id', 'name']);
+
+        return view('admin.items.index', compact('items', 'categories'));
+    }
+
+    /**
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
      * Display a listing of the items for users with advanced filtering
      */
     public function index(Request $request)
@@ -57,7 +85,11 @@ class ItemController extends Controller
                         ->select('id', 'item_id', 'quantity', 'status');
                 }
             ])
+<<<<<<< HEAD
                 ->select('id', 'name', 'description', 'stock', 'category_id', 'created_at', 'updated_at')
+=======
+                ->select('id', 'name', 'description', 'stock', 'category_id', 'photo', 'created_at', 'updated_at')
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
                 ->where('stock', '>', 0);
 
             // ============ 4. APPLY FILTER BERDASARKAN KATEGORI ============
@@ -169,6 +201,10 @@ class ItemController extends Controller
 
             // Fallback: tampilkan items tanpa filter jika ada error
             $items = Item::with('category')
+<<<<<<< HEAD
+=======
+                ->select('id', 'name', 'description', 'stock', 'category_id', 'photo', 'created_at', 'updated_at')
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
                 ->where('stock', '>', 0)
                 ->orderBy('name')
                 ->paginate(12);
@@ -204,6 +240,101 @@ class ItemController extends Controller
         }
     }
 
+<<<<<<< HEAD
+=======
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:100',
+            'category_id' => 'required|exists:categories,id',
+            'stock' => 'required|integer|min:0',
+            'description' => 'nullable|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $photoPath = null;
+        if ($request->hasFile('photo')) {
+            // Pastikan folder items ada di storage/app/public
+            if (!Storage::disk('public')->exists('items')) {
+                Storage::disk('public')->makeDirectory('items');
+            }
+            $photoPath = $request->file('photo')->store('items', 'public');
+        }
+
+        Item::create([
+            'name' => $data['name'],
+            'category_id' => $data['category_id'],
+            'stock' => $data['stock'],
+            'description' => $data['description'] ?? null,
+            'photo' => $photoPath,
+        ]);
+
+        return redirect()->route('admin.items.index')->with('success', 'Barang berhasil ditambahkan.');
+    }
+
+    public function update(Request $request, Item $item)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:100',
+            'category_id' => 'required|exists:categories,id',
+            'stock' => 'required|integer|min:0',
+            'description' => 'nullable|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $photoPath = $item->photo; // Keep existing photo by default
+
+        if ($request->hasFile('photo')) {
+            // Ensure items folder exists
+            if (!Storage::disk('public')->exists('items')) {
+                Storage::disk('public')->makeDirectory('items');
+            }
+            // Delete old photo if exists
+            if ($item->photo && Storage::disk('public')->exists($item->photo)) {
+                Storage::disk('public')->delete($item->photo);
+            }
+            // Store new photo
+            $photoPath = $request->file('photo')->store('items', 'public');
+        }
+
+        $item->update([
+            'name' => $data['name'],
+            'category_id' => $data['category_id'],
+            'stock' => $data['stock'],
+            'description' => $data['description'] ?? null,
+            'photo' => $photoPath,
+        ]);
+
+        return redirect()->route('admin.items.index')->with('success', 'Barang berhasil diperbarui.');
+    }
+
+    public function create()
+    {
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.items.create', compact('categories'));
+    }
+
+    public function edit(Item $item)
+    {
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.items.edit', compact('item', 'categories'));
+    }
+
+    public function destroy(Item $item)
+    {
+        // Delete photo if exists
+        if ($item->photo && Storage::disk('public')->exists($item->photo)) {
+            Storage::disk('public')->delete($item->photo);
+        }
+
+        $item->delete();
+
+        return redirect()->route('admin.items.index')->with('success', 'Barang berhasil dihapus.');
+    }
+
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
     /**
      * Display the specified item with detailed information
      */
@@ -420,6 +551,7 @@ class ItemController extends Controller
             'warning' => $durasi > 14 ? 'Durasi peminjaman melebihi 2 minggu' : null
         ]);
     }
+<<<<<<< HEAD
     // app/Models/Item.php (tambahkan method ini)
 
 public function isAvailableForBorrow($quantity)
@@ -433,3 +565,21 @@ public function isAvailableForBorrow($quantity)
     return $stokTersedia >= $quantity;
 }
 }
+=======
+
+    /**
+     * Check if item is available for borrow
+     */
+    public function isAvailableForBorrow(Item $item, int $quantity): bool
+    {
+        $dipinjam = Peminjaman::where('item_id', $item->id)
+            ->whereIn('status', ['diajukan', 'disetujui'])
+            ->sum('quantity');
+
+        $stokTersedia = (int) $item->stock - (int) $dipinjam;
+
+        return $stokTersedia >= $quantity;
+    }
+}
+
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2

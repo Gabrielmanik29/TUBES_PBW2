@@ -244,9 +244,23 @@
     }
 
     function closeBorrowModal() {
+<<<<<<< HEAD
         const modal = document.getElementById('borrowModal');
         const modalContent = document.getElementById('borrowModalContent');
 
+=======
+        // Hide loading first
+        hideLoading();
+
+        const modal = document.getElementById('borrowModal');
+        const modalContent = document.getElementById('borrowModalContent');
+
+        if (!modal || !modalContent) {
+            console.error('Modal elements not found');
+            return;
+        }
+
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
         // Hide modal with animation
         modalContent.classList.remove('scale-100', 'opacity-100');
         modalContent.classList.add('scale-95', 'opacity-0');
@@ -255,9 +269,29 @@
             modal.classList.add('hidden');
             document.body.style.overflow = 'auto';
 
+<<<<<<< HEAD
             // Reset form
             document.getElementById('borrowForm').reset();
             hideLoading();
+=======
+            // Reset form after modal is hidden
+            const form = document.getElementById('borrowForm');
+            if (form) {
+                form.reset();
+            }
+
+            // Reset modal content
+            document.getElementById('modalItemId').value = '';
+            document.getElementById('modalItemName').textContent = 'Nama Barang';
+            document.getElementById('modalCategoryName').textContent = 'Kategori';
+            document.getElementById('modalMaxStock').textContent = '0';
+            document.getElementById('quantityMax').textContent = '1';
+            document.getElementById('quantity').max = 1;
+            document.getElementById('quantity').value = 1;
+
+            // Reset duration info
+            document.getElementById('durationInfo').classList.add('hidden');
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
         }, 300);
     }
 
@@ -385,17 +419,40 @@
             if (validateBorrowForm()) {
                 showLoading();
 
+<<<<<<< HEAD
+=======
+                // Check if user is authenticated - using multiple methods
+                const isAuthenticated =
+                    document.querySelector('meta[name="user-authenticated"]') !== null ||
+                    (window.Laravel && window.Laravel.isAuthenticated === true) ||
+                    (window.Laravel && window.Laravel.userId !== undefined && window.Laravel.userId !== null);
+
+                if (!isAuthenticated) {
+                    hideLoading();
+                    alert('Sesi Anda telah berakhir. Silakan login kembali.');
+                    window.location.href = '/login';
+                    return;
+                }
+
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
                 // Get form data
                 const formData = new FormData(this);
                 const itemId = document.getElementById('modalItemId').value;
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
                 // Submit via AJAX
+<<<<<<< HEAD
+=======
+                console.log('Submitting borrow request for item:', itemId);
+                console.log('CSRF Token:', csrfToken);
+
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
                 fetch(`/borrow/${itemId}`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
+<<<<<<< HEAD
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
@@ -411,6 +468,31 @@
 
                         if (data.success) {
                             alert(data.message);
+=======
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: formData
+                })
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        console.log('Response ok:', response.ok);
+
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                console.error('Response text:', text);
+                                throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Response data:', data);
+                        hideLoading();
+
+                        if (data.success) {
+                            alert(data.message || 'Peminjaman berhasil diajukan!');
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
                             closeBorrowModal();
 
                             // Refresh the page to update stock availability
@@ -422,9 +504,24 @@
                         }
                     })
                     .catch(error => {
+<<<<<<< HEAD
                         hideLoading();
                         console.error('Error:', error);
                         alert('Terjadi kesalahan. Silakan coba lagi.');
+=======
+                        console.error('Fetch error:', error);
+                        hideLoading();
+
+                        // Show user-friendly error message
+                        let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+                        if (error.message.includes('HTTP error!')) {
+                            errorMessage = 'Terjadi kesalahan server. Silakan coba lagi nanti.';
+                        } else if (error.message.includes('Failed to fetch')) {
+                            errorMessage = 'Koneksi internet bermasalah. Periksa koneksi Anda.';
+                        }
+
+                        alert(errorMessage);
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
                     });
             }
         });

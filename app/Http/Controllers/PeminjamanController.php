@@ -16,6 +16,31 @@ class PeminjamanController extends Controller
      */
     public function store(Request $request, Item $item)
     {
+<<<<<<< HEAD
+=======
+        // Debug logging
+        \Log::info('Borrow request received', [
+            'user_id' => Auth::id(),
+            'item_id' => $item->id,
+            'request_data' => $request->all(),
+            'is_ajax' => $request->expectsJson()
+        ]);
+
+        // Check authentication
+        if (!Auth::check()) {
+            \Log::error('User not authenticated for borrow request');
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda harus login terlebih dahulu.'
+                ], 401);
+            }
+
+            return redirect()->route('login');
+        }
+
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
         // Validasi input
         $request->validate([
             'quantity' => [
@@ -23,8 +48,14 @@ class PeminjamanController extends Controller
                 'integer',
                 'min:1',
                 function ($attribute, $value, $fail) use ($item) {
+<<<<<<< HEAD
                     if ($value > $item->stock_tersedia) {
                         $fail("Jumlah melebihi stok tersedia. Stok tersedia: {$item->stock_tersedia}");
+=======
+                    if (!$item->isAvailableForBorrow($value)) {
+                        $availableStock = $item->stock_tersedia;
+                        $fail("Jumlah melebihi stok tersedia. Stok tersedia: {$availableStock}");
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
                     }
                 }
             ],
@@ -52,10 +83,42 @@ class PeminjamanController extends Controller
 
             DB::commit();
 
+<<<<<<< HEAD
+=======
+            \Log::info('Borrow request successful', ['peminjaman_id' => $peminjaman->id]);
+
+            // Check if request is AJAX
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Peminjaman berhasil diajukan! Menunggu persetujuan admin.',
+                    'peminjaman_id' => $peminjaman->id
+                ]);
+            }
+
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
             return redirect()->route('my.borrowings')
                 ->with('success', 'Peminjaman berhasil diajukan! Menunggu persetujuan admin.');
         } catch (\Exception $e) {
             DB::rollBack();
+<<<<<<< HEAD
+=======
+
+            \Log::error('Borrow request failed', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'item_id' => $item->id
+            ]);
+
+            // Check if request is AJAX
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan saat memproses permintaan.'
+                ], 500);
+            }
+
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

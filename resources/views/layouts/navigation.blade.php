@@ -19,6 +19,7 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden lg:ml-10 lg:flex lg:space-x-1">
+<<<<<<< HEAD
                     <!-- Dashboard -->
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
                         class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-blue-50 hover:text-blue-700">
@@ -26,6 +27,8 @@
                         Dashboard
                     </x-nav-link>
 
+=======
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
                     <!-- Items (Gabriel's Task) -->
                     <x-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')"
                         class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-green-50 hover:text-green-700">
@@ -41,6 +44,7 @@
                     </x-nav-link>
 
                     <!-- Admin Menu (for Admin users) -->
+<<<<<<< HEAD
                     @if(Auth::user()->role === 'admin')
                     <div class="relative" x-data="{ adminOpen: false }">
                         <button @click="adminOpen = !adminOpen"
@@ -80,6 +84,52 @@
                             </a>
                         </div>
                     </div>
+=======
+                    @if(Auth::check() && Auth::user()->role === 'admin')
+                        <div class="relative" x-data="{ adminOpen: false }">
+                            <button @click="adminOpen = !adminOpen"
+                                :class="{'bg-purple-100 text-purple-700': adminOpen, 'text-gray-700 hover:bg-purple-50': !adminOpen}"
+                                class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
+                                <i class="fas fa-crown mr-2"></i>
+                                Admin
+                                <svg class="ml-2 w-4 h-4 transition-transform" :class="{'rotate-180': adminOpen}"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <div x-show="adminOpen" @click.away="adminOpen = false" x-transition
+                                class="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                                <a href="{{ route('admin.items.create') }}"
+                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                                    <i class="fas fa-boxes mr-3 text-purple-500"></i>
+                                    Kelola Barang
+                                </a>
+                                <a href="{{ route('admin.categories.index') }}"
+                                    class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                                    <i class="fas fa-tags"></i>
+                                    Kelola Kategori
+                                </a>
+                                <a href="{{ route('admin.peminjaman') }}"
+                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                                    <i class="fas fa-clipboard-check mr-3 text-purple-500"></i>
+                                    Approve Peminjaman
+                                </a>
+                                <a href="{{ route('admin.peminjaman') }}"
+                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                                    <i class="fas fa-undo mr-3 text-purple-500"></i>
+                                    Pengembalian
+                                </a>
+                                <hr class="my-2 border-gray-200">
+                                <a href="#"
+                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                                    <i class="fas fa-chart-bar mr-3 text-purple-500"></i>
+                                    Laporan
+                                </a>
+                            </div>
+                        </div>
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
                     @endif
                 </div>
             </div>
@@ -174,6 +224,7 @@
     <!-- Mobile Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t border-gray-200 bg-white">
         <div class="px-4 pt-2 pb-3 space-y-1">
+<<<<<<< HEAD
             <!-- Mobile Dashboard -->
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
                 class="flex items-center px-3 py-2 rounded-lg text-base font-medium">
@@ -181,6 +232,8 @@
                 Dashboard
             </x-responsive-nav-link>
 
+=======
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
             <!-- Mobile Items -->
             <x-responsive-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')"
                 class="flex items-center px-3 py-2 rounded-lg text-base font-medium">
@@ -196,6 +249,7 @@
             </x-responsive-nav-link>
 
             <!-- Mobile Admin Menu -->
+<<<<<<< HEAD
             @if(Auth::user()->role === 'admin')
             <div class="px-3 py-2">
                 <div class="flex items-center text-purple-700 font-medium">
@@ -220,6 +274,37 @@
                     </a>
                 </div>
             </div>
+=======
+            @if(Auth::check() && Auth::user()->role === 'admin')
+                <div class="px-3 py-2">
+                    <div class="flex items-center text-purple-700 font-medium">
+                        <i class="fas fa-crown mr-3"></i>
+                        Menu Admin
+                    </div>
+                    <div class="ml-6 mt-2 space-y-1">
+                        <a href="{{ route('admin.items.create') }}"
+                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
+                            <i class="fas fa-boxes mr-3"></i>
+                            Kelola Barang
+                        </a>
+                        <a href="{{ route('admin.categories.index') }}"
+                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg"
+                            <i class="fas fa-tags mr-3"></i>
+                            Kelola Kategori
+                        </a>
+                        <a href="{{ route('admin.peminjaman') }}"
+                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
+                            <i class="fas fa-clipboard-check mr-3"></i>
+                            Approve Peminjaman
+                        </a>
+                        <a href="{{ route('admin.peminjaman') }}"
+                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
+                            <i class="fas fa-undo mr-3"></i>
+                            Pengembalian
+                        </a>
+                    </div>
+                </div>
+>>>>>>> d55b9af1f343e0e3324d653f7222d76df8c70cd2
             @endif
         </div>
 
