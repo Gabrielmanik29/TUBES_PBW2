@@ -11,32 +11,61 @@ use Illuminate\Support\Facades\Log;
 class AdminController extends Controller
 {
     /**
-     * Menampilkan daftar peminjaman untuk admin
+     * ============================================================
+     * KELOLA PEMINJAMAN - Method Index (Unified untuk semua status)
+     * ============================================================
+     *
+     * Menampilkan SEMUA data peminjaman dengan fitur filter status.
+     * Supports: diajukan, disetujui, ditolak, dikembalikan
      */
-    public function peminjaman(Request $request)
+    public function index(Request $request)
     {
         $query = Peminjaman::with(['user', 'item.category']);
 
-        // Filter berdasarkan status
-        if ($request->status && $request->status !== 'all') {
+        // Filter berdasarkan status (diajukan/disetujui/dikembalikan/dll)
+        if ($request->has('status') && !empty($request->status) && $request->status !== 'all') {
             $query->where('status', $request->status);
         }
 
         // Filter berdasarkan pencarian nama user atau item
-        if ($request->search) {
+        if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
-            $query->whereHas('user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            })
-                ->orWhereHas('item', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
-                });
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($subQ) use ($search) {
+                    $subQ->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('item', function ($subQ) use ($search) {
+                        $subQ->where('name', 'like', "%{$search}%");
+                    });
+            });
         }
 
-        $peminjamans = $query->latest()->paginate(10);
+        // Sorting
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDir = $request->get('sort_dir', 'desc');
+        $query->orderBy($sortBy, $sortDir);
 
-        return view('admin.peminjaman.index', compact('peminjamans'));
+        // Pagination dengan 10 item per halaman
+        $peminjamans = $query->paginate(10)->withQueryString();
+
+        // Stats untuk dashboard
+        $stats = [
+            'total' => Peminjaman::count(),
+            'diajukan' => Peminjaman::where('status', 'diajukan')->count(),
+            'disetujui' => Peminjaman::where('status', 'disetujui')->count(),
+            'dikembalikan' => Peminjaman::where('status', 'dikembalikan')->count(),
+        ];
+
+        return view('admin.peminjaman.index', compact('peminjamans', 'stats'));
+    }
+
+    /**
+     * Alias untuk method index (backward compatibility)
+     */
+    public function peminjaman(Request $request)
+    {
+        return $this->index($request);
     }
 
     /**
@@ -209,3 +238,4 @@ class AdminController extends Controller
         ]);
     }
 }
+

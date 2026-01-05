@@ -7,6 +7,7 @@ use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DendaPaymentController;
 
@@ -30,13 +31,18 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
-    // PEMINJAMAN
-    Route::get('/peminjaman', [AdminController::class, 'peminjaman'])->name('admin.peminjaman');
+    // ============================================================
+    // KELOLA PEMINJAMAN - Unified Route
+    // ============================================================
+    Route::get('/peminjamans', [AdminController::class, 'index'])->name('admin.peminjamans.index');
     Route::get('/peminjaman/{peminjaman}', [AdminController::class, 'show'])->name('admin.peminjaman.show');
     Route::post('/peminjaman/{peminjaman}/approve', [AdminController::class, 'approve'])->name('admin.peminjaman.approve');
     Route::post('/peminjaman/{peminjaman}/reject', [AdminController::class, 'reject'])->name('admin.peminjaman.reject');
     Route::post('/peminjaman/{peminjaman}/return', [AdminController::class, 'return'])->name('admin.peminjaman.return');
     Route::post('/peminjaman/{peminjaman}/confirm-denda', [AdminController::class, 'confirmDendaPaid'])->name('admin.peminjaman.confirm-denda');
+
+    // Backward compatibility alias
+    Route::get('/peminjaman', [AdminController::class, 'peminjaman'])->name('admin.peminjaman');
 
     // API: Calculate Denda
     Route::post('/api/calculate-denda', [AdminController::class, 'calculateDenda'])->name('admin.calculate.denda');
@@ -46,6 +52,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
     Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+
+    // LAPORAN
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
+    Route::get('/laporan/export/excel', [LaporanController::class, 'exportExcel'])->name('admin.laporan.export.excel');
+    Route::get('/laporan/export/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.export.pdf');
 });
 
 // ============ ITEM ROUTES FOR USERS ============

@@ -60,15 +60,10 @@
                                     <i class="fas fa-tags"></i>
                                     Kelola Kategori
                                 </a>
-                                <a href="{{ route('admin.peminjaman') }}"
+                                <a href="{{ route('admin.peminjamans.index') }}"
                                     class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
                                     <i class="fas fa-clipboard-check mr-3 text-purple-500"></i>
-                                    Approve Peminjaman
-                                </a>
-                                <a href="{{ route('admin.peminjaman') }}"
-                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                                    <i class="fas fa-undo mr-3 text-purple-500"></i>
-                                    Pengembalian
+                                    Kelola Peminjaman
                                 </a>
                                 <hr class="my-2 border-gray-200">
                                 <a href="#"
@@ -200,19 +195,14 @@
                             Kelola Barang
                         </a>
                         <a href="{{ route('admin.categories.index') }}"
-                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg"
+                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
                             <i class="fas fa-tags mr-3"></i>
                             Kelola Kategori
                         </a>
-                        <a href="{{ route('admin.peminjaman') }}"
+                        <a href="{{ route('admin.peminjamans.index') }}"
                             class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
                             <i class="fas fa-clipboard-check mr-3"></i>
-                            Approve Peminjaman
-                        </a>
-                        <a href="{{ route('admin.peminjaman') }}"
-                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-lg">
-                            <i class="fas fa-undo mr-3"></i>
-                            Pengembalian
+                            Kelola Peminjaman
                         </a>
                     </div>
                 </div>
