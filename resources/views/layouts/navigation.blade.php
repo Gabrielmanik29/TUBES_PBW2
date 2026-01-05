@@ -66,7 +66,7 @@
                                     Kelola Peminjaman
                                 </a>
                                 <hr class="my-2 border-gray-200">
-                                <a href="#"
+                                <a href="{{ route('admin.laporan.index') }}"
                                     class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700">
                                     <i class="fas fa-chart-bar mr-3 text-purple-500"></i>
                                     Laporan

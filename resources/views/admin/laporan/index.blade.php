@@ -6,11 +6,11 @@
             </h2>
             <div class="flex items-center gap-2">
                 {{-- Tombol Print/Export --}}
-                <a href="{{ route('admin.laporan.export.pdf') }}" 
+                <a href="{{ route('admin.laporan.export.pdf') }}?{{ http_build_query(request()->only(['start_date', 'end_date', 'status'])) }}" 
                    class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow transition">
                     <i class="fas fa-print mr-2"></i> Print
                 </a>
-                <a href="{{ route('admin.laporan.export.excel') }}" 
+                <a href="{{ route('admin.laporan.export.excel') }}?{{ http_build_query(request()->only(['start_date', 'end_date', 'status'])) }}" 
                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow transition">
                     <i class="fas fa-file-excel mr-2"></i> Export Excel
                 </a>

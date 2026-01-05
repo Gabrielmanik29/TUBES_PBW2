@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Peminjaman;
+use App\Exports\LaporanExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LaporanController extends Controller
 {
@@ -43,7 +45,6 @@ class LaporanController extends Controller
         $totalDenda = (clone $query)->sum('denda');
 
         // 3. Barang Belum Kembali (status 'disetujui' / 'dipinjam')
-        // Berdasarkan data yang terfilter berdasarkan tanggal
         $barangBelumKembaliQuery = Peminjaman::whereIn('status', ['disetujui']);
 
         if ($request->has('start_date') && !empty($request->start_date)) {
@@ -68,25 +69,28 @@ class LaporanController extends Controller
     }
 
     /**
+     * Export laporan ke Excel dengan filter
+     */
+    public function exportExcel(Request $request)
+    {
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $status = $request->get('status');
+
+        $filename = 'laporan-peminjaman-' . date('Y-m-d-H-i-s') . '.xlsx';
+
+        return Excel::download(
+            new LaporanExport($startDate, $endDate, $status),
+            $filename
+        );
+    }
+
+    /**
      * Export laporan ke PDF (placeholder - bisa dikembangkan lebih lanjut)
      */
     public function exportPdf(Request $request)
     {
-        // Logika export PDF bisa ditambahkan di sini
-        // Contoh: menggunakan DomPDF atau Snappy
-
         return back()->with('info', 'Fitur export PDF akan segera tersedia.');
-    }
-
-    /**
-     * Export laporan ke Excel (placeholder - bisa dikembangkan lebih lanjut)
-     */
-    public function exportExcel(Request $request)
-    {
-        // Logika export Excel bisa ditambahkan di sini
-        // Contoh: menggunakan Maatwebsite Excel
-
-        return back()->with('info', 'Fitur export Excel akan segera tersedia.');
     }
 }
 
