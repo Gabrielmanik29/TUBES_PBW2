@@ -92,6 +92,8 @@ class PaymentController extends Controller
 
             // ==========================================
             // PERSIAPAN DATA UNTUK MIDTRANS
+            // - Generate unique `midtrans_order_id` per payment attempt
+            // - Do NOT reuse `order->order_id` for Midtrans
             // ==========================================
 
             // 1. Siapkan item details dari order items
@@ -105,61 +107,79 @@ class PaymentController extends Controller
                 ];
             }
 
-            // 2. Siapkan data transaksi
+            // 2. Buat unique Midtrans order id untuk setiap percobaan pembayaran
+            // Use UUID to ensure uniqueness and avoid exposing internal order_id
+            $midtransOrderId = (string) Str::uuid();
+
+            // 3. Siapkan data transaksi (pass Midtrans-specific order id)
             $transactionDetails = [
-                'order_id' => $order->order_id,
-                'gross_amount' => (int) $order->total_amount,
+                'order_id' => $midtransOrderId,
+                'gross_amount' => (int) $order->total_price,
             ];
 
-            // 3. Siapkan data customer
+            // 4. Siapkan data customer
             $customerDetails = [
                 'first_name' => $user->name,
                 'email' => $user->email,
                 'phone' => $request->phone ?? '',
             ];
 
-            // 4. Buat array lengkap untuk Snap API
+            // 5. Buat array lengkap untuk Snap API
             $midtransParams = [
                 'transaction_details' => $transactionDetails,
                 'item_details' => $itemDetails,
                 'customer_details' => $customerDetails,
                 'callbacks' => [
-                    // Redirect setelah pembayaran selesai
                     'finish' => route('payment.finish'),
-                    // Redirect jika pembayaran tidak selesai
                     'unfinish' => route('payment.unfinish'),
-                    // Redirect jika terjadi error
                     'error' => route('payment.error'),
                 ],
             ];
 
             // ==========================================
             // GENERATE SNAP TOKEN DARI MIDTRANS
+            // - Tokens are single-use: generate a fresh Midtrans order id
+            //   and token for every attempt. Do not reuse previous token.
             // ==========================================
             $snapToken = Snap::getSnapToken($midtransParams);
 
             // ==========================================
-            // SIMPAN SNAP TOKEN KE DATABASE
+            // SIMPAN MIDTRANS ORDER ID DAN SNAP TOKEN KE DATABASE
+            // - Overwrite any previous snap token so retry yields new token
+            // - Keep `order->order_id` unchanged
             // ==========================================
-            $order->update([
-                'snap_token' => $snapToken,
-                'payment_status' => 'unpaid',
-            ]);
+            DB::transaction(function () use ($order, $midtransOrderId, $snapToken) {
+                // Store snap token and midtrans order id in order_payments table
+                $order->payment()->updateOrCreate(
+                    ['order_id' => $order->id],
+                    [
+                        'midtrans_order_id' => $midtransOrderId,
+                        'snap_token' => $snapToken,
+                        'status' => 'pending',
+                    ]
+                );
 
-            // Return response sukses dengan snap_token
+                // Ensure order payment status remains unpaid
+                $order->update([
+                    'payment_status' => 'unpaid',
+                ]);
+            });
+
+            // Return response sukses dengan snap_token dan midtrans_order_id
             return response()->json([
                 'success' => true,
                 'message' => 'Snap Token berhasil dibuat',
                 'snap_token' => $snapToken,
+                'midtrans_order_id' => $midtransOrderId,
                 'order_id' => $order->order_id,
             ]);
 
         } catch (\Exception $e) {
             // Log detailed error untuk debugging
-            Log::error('Failed to create payment transaction - Midtrans Error', [
+            \Log::error('Failed to create payment transaction - Midtrans Error', [
                 'order_id' => $order->order_id,
                 'user_id' => $user->id,
-                'total_amount' => (int) $order->total_amount,
+                'total_price' => (int) $order->total_price,
                 'error_message' => $e->getMessage(),
                 'error_code' => $e->getCode(),
                 'error_file' => $e->getFile(),
@@ -170,17 +190,10 @@ class PaymentController extends Controller
                 'is_production' => env('MIDTRANS_IS_PRODUCTION', false)
             ]);
 
-            // Return actual error message dari Midtrans
+            // Return generic error message to avoid exposing internal details
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal membuat transaksi: ' . $e->getMessage(),
-                'error_code' => $e->getCode(),
-                'debug_info' => [
-                    'order_id' => $order->order_id,
-                    'amount' => (int) $order->total_amount,
-                    'server_key_configured' => env('MIDTRANS_SERVER_KEY') ? 'YES' : 'NO',
-                    'is_production' => env('MIDTRANS_IS_PRODUCTION', false)
-                ]
+                'message' => 'Terjadi kesalahan saat membuat transaksi. Silakan coba lagi atau hubungi dukungan.'
             ], 500);
         }
     }

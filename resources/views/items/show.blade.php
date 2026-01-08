@@ -69,7 +69,7 @@
                                 <div class="bg-blue-50 rounded-lg p-4 text-center">
                                     <div class="text-2xl font-bold text-blue-600">{{ $itemStats['total_borrowings'] }}
                                     </div>
-                                    <div class="text-xs text-gray-600">Total Pinjam</div>
+                                    <div class="text-xs text-gray-600">Diajukan</div>
                                 </div>
                                 <div class="bg-green-50 rounded-lg p-4 text-center">
                                     <div class="text-2xl font-bold text-green-600">
