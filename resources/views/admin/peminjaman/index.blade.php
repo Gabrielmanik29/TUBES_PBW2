@@ -317,13 +317,23 @@
                                                 </span>
                                             @endif
 
-                                            {{-- Denda Confirmation Button (if applicable) --}}
+                                            {{-- Denda Actions (if applicable) --}}
                                             @if($peminjaman->denda > 0 && !$peminjaman->denda_dibayar && $peminjaman->status === 'dikembalikan')
-                                                <button type="button" onclick="confirmDendaPaid({{ $peminjaman->id }})"
-                                                    class="inline-flex items-center px-2.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded transition shadow-sm"
-                                                    title="Konfirmasi Pembayaran Denda">
-                                                    <i class="fas fa-money-bill-wave"></i>
-                                                </button>
+                                                <div class="flex gap-1">
+                                                    {{-- Pay Denda Button --}}
+                                                    <a href="{{ route('denda.detail', $peminjaman) }}"
+                                                        target="_blank"
+                                                        class="inline-flex items-center px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-medium rounded transition shadow-sm"
+                                                        title="Bayar Denda">
+                                                        <i class="fas fa-credit-card"></i>
+                                                    </a>
+                                                    {{-- Confirm Denda Paid Button --}}
+                                                    <button type="button" onclick="confirmDendaPaid({{ $peminjaman->id }})"
+                                                        class="inline-flex items-center px-2.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded transition shadow-sm"
+                                                        title="Konfirmasi Pembayaran Denda">
+                                                        <i class="fas fa-money-bill-wave"></i>
+                                                    </button>
+                                                </div>
                                             @endif
                                         </div>
                                     </td>
@@ -467,6 +477,12 @@
                             <p class="text-xs text-yellow-600 uppercase">Total Denda</p>
                             <p class="text-2xl font-bold text-red-600" id="return_total_denda">Rp 0</p>
                         </div>
+                    </div>
+                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p class="text-sm text-blue-700">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Setelah pengembalian, user dapat membayar denda melalui link pembayaran yang akan dikirim atau melalui halaman peminjaman mereka.
+                        </p>
                     </div>
                 </div>
 

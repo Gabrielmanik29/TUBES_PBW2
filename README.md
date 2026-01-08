@@ -33,7 +33,7 @@ Kelas: **D3IF – 48 - 04**
 ## Arsitektur & Teknologi
 
 -   **Framework:** Laravel 11
--   **Database:** MySQL
+-   **Database:** sqlite
 -   **Autentikasi:** Laravel Breeze (Blade + Tailwind CSS)
 -   **Payment Gateway:** Midtrans
 

@@ -10,14 +10,21 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DendaPaymentController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\MidtransCallbackController;
+
+Route::post('/midtrans/callback', [MidtransCallbackController::class, 'handle'])
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
 Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('items.index');
     }
-
     return redirect()->route('login');
 });
+
+// ============ TEMPORARY TEST ROUTE FOR MIDTRANS ============
+Route::get('/test-midtrans', [App\Http\Controllers\TestController::class, 'testMidtrans'])->name('test.midtrans');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth'])
@@ -57,29 +64,26 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
     Route::get('/laporan/export/excel', [LaporanController::class, 'exportExcel'])->name('admin.laporan.export.excel');
     Route::get('/laporan/export/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.export.pdf');
+
+    // LAPORAN - Generate Snap Token for Denda Payment (FIXED FOR 10023 ERROR)
+    // Route ini sekarang mengarah ke LaporanController yang baru saja kita buat
+    Route::get('/laporan/{peminjaman}/generate-snap-token', [LaporanController::class, 'generateSnapToken'])
+        ->name('admin.laporan.generate-snap-token');
 });
 
 // ============ ITEM ROUTES FOR USERS ============
 Route::controller(ItemController::class)->name('items.')->group(function () {
-    // Main item listing with filters
     Route::get('/items', 'index')->name('index');
-
-    // Item detail page
     Route::get('/items/{item}', 'show')->name('show')->whereNumber('item');
-
-    // AJAX endpoints
     Route::get('/api/items/search', 'searchAjax')->name('search.ajax');
     Route::get('/api/items/{item}/available-dates', 'getAvailableDates')->name('available.dates');
     Route::post('/api/items/calculate-return', 'calculateReturnDate')->name('calculate.return');
-
-    // Export feature
     Route::get('/items/export/pdf', 'exportPdf')->name('export.pdf')->middleware('auth');
 });
 
 // ============ ADMIN ITEM ROUTES ============
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::controller(ItemController::class)->group(function () {
-        // Admin item management
         Route::get('/items', 'adminIndex')->name('admin.items.index');
         Route::get('/items/create', 'create')->name('admin.items.create');
         Route::post('/items', 'store')->name('admin.items.store');
@@ -91,55 +95,25 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
 // ============ BORROWING ROUTES ============
 Route::middleware(['auth'])->group(function () {
-    // Routes untuk peminjaman user
     Route::get('/my-borrowings', [PeminjamanController::class, 'myBorrowings'])->name('my.borrowings');
     Route::post('/borrow/{item}', [PeminjamanController::class, 'store'])
         ->name('borrow.store')
-        ->middleware('throttle:5,10'); // Limit 5 requests per 10 minutes
+        ->middleware('throttle:5,10'); 
     Route::delete('/peminjaman/{peminjaman}/cancel', [PeminjamanController::class, 'cancel'])->name('peminjaman.cancel');
+    Route::get('/borrow/check-availability/{item}', [PeminjamanController::class, 'checkAvailability'])->name('borrow.check');
 
-    Route::get('/borrow/check-availability/{item}', [PeminjamanController::class, 'checkAvailability'])
-        ->name('borrow.check');
-
-    // Payment routes for denda
     Route::get('/payment/{peminjaman}/snap-token', [OrderController::class, 'generateSnapToken'])
         ->name('payment.snap-token');
 });
 
 // ============ DENDA PAYMENT ROUTES (MIDTRANS) ============
 Route::prefix('denda')->name('denda.')->middleware(['auth'])->group(function () {
-    // Halaman detail pembayaran denda
-    Route::get('/{peminjaman}', [DendaPaymentController::class, 'detail'])
-        ->name('detail');
-
-    // Checkout - Generate Snap Token
-    Route::post('/checkout', [DendaPaymentController::class, 'checkout'])
-        ->name('checkout');
-
-    // Callback - Webhook dari Midtrans (di-exclude dari CSRF)
+    Route::get('/{peminjamanId}', [DendaPaymentController::class, 'detail'])->name('detail');
+    Route::post('/checkout', [DendaPaymentController::class, 'checkout'])->name('checkout');
     Route::post('/callback', [DendaPaymentController::class, 'callback'])
-        ->name('callback');
-
-    // Redirect URLs dari Midtrans
-    Route::get('/{peminjaman}/finish', [DendaPaymentController::class, 'finish'])
-        ->name('finish');
-    Route::get('/{peminjaman}/unfinish', [DendaPaymentController::class, 'unfinish'])
-        ->name('unfinish');
-    Route::get('/{peminjaman}/failed', [DendaPaymentController::class, 'failed'])
-        ->name('failed');
-
-    // API: Get payment status
-    Route::get('/api/status/{peminjaman}', [DendaPaymentController::class, 'status'])
-        ->name('status');
+        ->name('callback')
+        ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    Route::get('/{peminjamanId}/finish', [DendaPaymentController::class, 'finish'])->name('finish');
 });
 
-// ============ MIDTRANS NOTIFICATION ROUTES ============
-Route::post('/midtrans/notification', [OrderController::class, 'handleNotification'])
-    ->name('midtrans.notification');
-
-// Midtrans callback dengan validasi signature
-Route::post('/payment/midtrans-callback', [OrderController::class, 'midtransCallback'])
-    ->name('payment.midtrans-callback');
-
-require __DIR__ . '/auth.php';
-
+require __DIR__.'/auth.php';

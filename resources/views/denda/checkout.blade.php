@@ -221,7 +221,12 @@
                             peminjaman_id: peminjamanId
                         })
                     })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             if (data.success) {
                                 // Tampilkan Midtrans dengan token baru
@@ -238,13 +243,12 @@
                                     }
                                 });
                             } else {
-                                alert('Gagal membuat transaksi: ' + data.message);
-                                hideLoading();
+                                throw new Error(data.message || 'Gagal membuat transaksi');
                             }
                         })
                         .catch(error => {
-                            console.error('Error:', error);
-                            alert('Terjadi kesalahan. Silakan coba lagi.');
+                            console.error('Checkout Error:', error);
+                            alert('Error: ' + error.message);
                             hideLoading();
                         });
                 }
@@ -273,7 +277,7 @@
                 document.getElementById('loading-overlay').classList.remove('hidden');
 
                 // Redirect ke halaman finish
-                window.location.href = '{{ route('denda.finish', ['peminjaman_id' => $peminjaman->id]) }}?order_id=' + result.order_id;
+                window.location.href = '{{ route('denda.finish', ['peminjamanId' => $peminjaman->id]) }}?order_id=' + result.order_id;
             }
 
             // Handle payment pending

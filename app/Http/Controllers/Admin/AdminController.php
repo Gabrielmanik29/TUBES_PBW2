@@ -149,8 +149,7 @@ class AdminController extends Controller
 
             // Kembalikan stok item
             $item = $peminjaman->item;
-            $item->increment('stock_tersedia', $peminjaman->quantity);
-            $item->decrement('stock_dipinjam', $peminjaman->quantity);
+            $item->increment('stock', $peminjaman->quantity);
 
             DB::commit();
 

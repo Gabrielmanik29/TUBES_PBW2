@@ -27,11 +27,7 @@ class PaymentController extends Controller
      */
     public function __construct()
     {
-        // Konfigurasi Midtrans
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = config('midtrans.is_production');
-        Config::$isSanitized = config('midtrans.is_sanitized');
-        Config::$is3ds = config('midtrans.is_3ds');
+        // Midtrans configuration will be set directly in methods to bypass config cache
     }
 
     /**
@@ -80,6 +76,20 @@ class PaymentController extends Controller
         }
 
         try {
+            // Setup Midtrans configuration langsung dari .env
+            Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+            Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+
+            // Disable SSL verification in development mode
+            if (!env('MIDTRANS_IS_PRODUCTION', false)) {
+                Config::$curlOptions = [
+                    CURLOPT_SSL_VERIFYHOST => 0,
+                    CURLOPT_SSL_VERIFYPEER => 0,
+                ];
+            }
+
             // ==========================================
             // PERSIAPAN DATA UNTUK MIDTRANS
             // ==========================================
@@ -145,10 +155,32 @@ class PaymentController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            // Jika terjadi error, return response error
+            // Log detailed error untuk debugging
+            Log::error('Failed to create payment transaction - Midtrans Error', [
+                'order_id' => $order->order_id,
+                'user_id' => $user->id,
+                'total_amount' => (int) $order->total_amount,
+                'error_message' => $e->getMessage(),
+                'error_code' => $e->getCode(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'stack_trace' => $e->getTraceAsString(),
+                'midtrans_params' => isset($midtransParams) ? $midtransParams : 'N/A',
+                'server_key_used' => env('MIDTRANS_SERVER_KEY') ? 'YES' : 'NO',
+                'is_production' => env('MIDTRANS_IS_PRODUCTION', false)
+            ]);
+
+            // Return actual error message dari Midtrans
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal membuat transaksi: ' . $e->getMessage()
+                'message' => 'Gagal membuat transaksi: ' . $e->getMessage(),
+                'error_code' => $e->getCode(),
+                'debug_info' => [
+                    'order_id' => $order->order_id,
+                    'amount' => (int) $order->total_amount,
+                    'server_key_configured' => env('MIDTRANS_SERVER_KEY') ? 'YES' : 'NO',
+                    'is_production' => env('MIDTRANS_IS_PRODUCTION', false)
+                ]
             ], 500);
         }
     }
