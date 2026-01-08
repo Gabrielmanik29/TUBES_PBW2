@@ -15,7 +15,6 @@ class TestController extends Controller
     {
         try {
             // Hardcode Midtrans configuration
-            Config::$serverKey = 'Mid-server-tKixyXh2zSYbgANesal-fK_o';
             Config::$isProduction = false;
             Config::$isSanitized = true;
             Config::$is3ds = true;
@@ -58,7 +57,6 @@ class TestController extends Controller
                 'snap_token' => $snapToken,
                 'order_id' => $orderId,
                 'gross_amount' => $grossAmount,
-                'server_key_used' => 'Mid-server-tKixyXh2zSYbgANesal-fK_o',
                 'is_production' => false,
             ]);
 
@@ -70,7 +68,6 @@ class TestController extends Controller
                 'error_details' => [
                     'order_id' => $orderId ?? 'N/A',
                     'gross_amount' => $grossAmount ?? 'N/A',
-                    'server_key_used' => 'Mid-server-tKixyXh2zSYbgANesal-fK_o',
                     'is_production' => false,
                     'error_file' => $e->getFile(),
                     'error_line' => $e->getLine(),

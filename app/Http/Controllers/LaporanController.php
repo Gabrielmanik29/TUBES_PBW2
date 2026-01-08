@@ -98,7 +98,6 @@ class LaporanController extends Controller
             // Gunakan backslash (\) untuk memastikan namespace global SDK Midtrans terpanggil
 // Bagian Konfigurasi
 // TULIS PERSIS SEPERTI INI (Ganti kuncinya dengan Server Key kamu):
-            \Midtrans\Config::$serverKey = 'Mid-server-tKixyXh2zSYbgANesal-fK_o'; 
             \Midtrans\Config::$isProduction = false;
             \Midtrans\Config::$isSanitized = true;
             \Midtrans\Config::$is3ds = true;
